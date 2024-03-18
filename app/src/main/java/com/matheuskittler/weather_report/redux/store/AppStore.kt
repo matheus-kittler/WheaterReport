@@ -9,8 +9,20 @@ import com.matheuskittler.weather_report.redux.state.AppState
 import org.reduxkotlin.applyMiddleware
 import org.reduxkotlin.createStore
 
+//val store = createStore(
+//    reducer, AppState(false, Location("", "", "", "", "", "", "", HourlyUnits("", ""), Hourly(listOf(), floatArrayOf()))) ,"" ,, applyMiddleware(
+//        createThunkMiddleware(),
+//        loggingMiddleware,
+//        crashReporter,
+//    )
+//)
+
+val initialAppState = AppState(location = Location(), errorMessage = "", isLoading = false)
+
 val store = createStore(
-    reducer, AppState(false, Location("", "", "", "", "", "", "", "", "")), applyMiddleware(
+    reducer,
+    initialAppState,
+    applyMiddleware(
         createThunkMiddleware(),
         loggingMiddleware,
         crashReporter,

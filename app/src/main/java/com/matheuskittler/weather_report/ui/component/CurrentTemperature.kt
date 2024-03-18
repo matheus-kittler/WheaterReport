@@ -2,7 +2,6 @@ package com.matheuskittler.weather_report.ui.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -20,16 +19,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun CurrentTemperature(temperature: String, time: String, max: String, min: String) {
+fun CurrentTemperature(temperature: Float, date: String, max: String, min: String) {
 
     Column(
         modifier = Modifier.wrapContentSize(),
     ) {
-        Text(text = time, color = Color.Black, fontSize = 19.sp)
+        Text(text = date[0].toString(), color = Color.Black, fontSize = 19.sp)
         Row(
           verticalAlignment = Alignment.Bottom
         ) {
-            Text(text = temperature, color = Color.Black, fontSize = 65.sp)
+            Text(text = temperature.toString(), color = Color.Black, fontSize = 65.sp)
             Icon(
                 imageVector = Icons.Rounded.Favorite,
                 contentDescription = "",
@@ -47,6 +46,6 @@ fun CurrentTemperature(temperature: String, time: String, max: String, min: Stri
 @Composable
 private fun CurrentTemperaturePreview() {
     MaterialTheme {
-        CurrentTemperature("27", "12:00", "20", "12")
+        CurrentTemperature(28.8F, "12:00", "20", "12")
     }
 }

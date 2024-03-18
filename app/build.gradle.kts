@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.resolve.sam.SamConstructorDescriptorKindExclude.excludes
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -88,5 +90,12 @@ dependencies {
 
     //Gson
     implementation("com.google.code.gson:gson:2.10.1")
+
+    //Okhttp
+    implementation("com.squareup.okhttp3:okhttp:3.14.9")
+    implementation("com.squareup.okhttp3:logging-interceptor:3.13.1")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+
 
 }
