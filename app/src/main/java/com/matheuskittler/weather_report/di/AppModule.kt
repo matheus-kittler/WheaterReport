@@ -1,28 +1,24 @@
 package com.matheuskittler.weather_report.di
 
-import android.content.res.Resources
-import android.net.Network
-import com.matheuskittler.weather_report.redux.state.AppState
-import com.matheuskittler.weather_report.redux.store.store
-import com.matheuskittler.weather_report.service.IWeatherAPI
-import com.matheuskittler.weather_report.service.IWeatherService
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.scope.get
 import org.koin.dsl.module
-import org.reduxkotlin.Store
+import com.matheuskittler.weather_report.service.IWeatherAPI
+import com.matheuskittler.weather_report.service.WeatherService
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
-val reduxModule = module {
-    single<Store<AppState>> {
-        store
+private const val BASE_URL = "https://api.open-meteo.com"
+
+val appModule = module {
+    // Declaração do serviço WeatherService
+    single { WeatherService(get()) }
+
+    // Configuração do Retrofit e criação da instância de IWeatherAPI
+    single<IWeatherAPI> {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        retrofit.create(IWeatherAPI::class.java)
     }
 }
-
-val networkModule = module {
-
-    single<Resources> { androidContext().resources }
-//    module + NetworkModule
-
-//    single<IWeatherService> { WeatherService(get()) }
-}
-
-val appModules = listOf(reduxModule, networkModule)

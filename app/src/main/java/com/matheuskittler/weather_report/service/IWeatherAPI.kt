@@ -1,6 +1,7 @@
 package com.matheuskittler.weather_report.service
 
 import com.matheuskittler.weather_report.model.Location
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.GET
@@ -14,13 +15,6 @@ interface IWeatherAPI {
         @Query("forecast_days") forecastDays: Int,
         @Query("temperature_2m") temperature: String,
         @Query("hourly") hourly: String,
-    ): Location
 
-//    fun getWeatherReport(
-//    @Query("latitude") latitude: String,
-//    @Query("longitude") longitude: String,
-//    @Query("forecast_days") forecastDays: Int,
-//    @Query("temperature_2m") temperature: String,
-//    @Query("hourly") hourly: String,
-//    ) : Call<Location>
+    ): Response<Location>
 }

@@ -1,7 +1,7 @@
 package com.matheuskittler.weather_report
 
 import android.app.Application
-import com.matheuskittler.weather_report.di.appModules
+import com.matheuskittler.weather_report.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -13,7 +13,7 @@ class MyApp : Application() {
         startKoin {
             androidLogger(Level.ERROR)
             androidContext(this@MyApp)
-            modules(appModules)
+            modules(appModule)
         }
     }
 }

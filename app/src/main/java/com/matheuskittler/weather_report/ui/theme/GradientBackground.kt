@@ -24,71 +24,13 @@ import com.matheuskittler.weather_report.ui.component.CurrentTemperature
 import com.matheuskittler.weather_report.ui.component.RowScrollHorizontal
 import com.matheuskittler.weather_report.ui.component.TextFieldLocation
 
-@Composable
-fun BackgroundMode() {
-    val location by remember { mutableStateOf<Location?>(null) }
-    val context = LocalContext.current
-    Scaffold { padding ->
-        if (location != null) {
-            Column(
-                modifier = Modifier.padding(padding)
-            ) {
-                TextFieldLocation(
-                    onSearch = { query ->
-                        // Lógica de pesquisa com a query
-                    }
-                )
-                Spacer(modifier = Modifier.padding(10.dp))
-                Row(
-                    modifier = Modifier.padding(horizontal = 15.dp)
-                ) {
-                    Column {
-                        Text(
-                            text = "Previsão do tempo de hora em hora",
-                            color = Color.Black,
-                            fontSize = 14.sp
-                        )
-                        Spacer(modifier = Modifier.padding(top = 2.dp))
-                        RowScrollHorizontal(false, location!!)
-                    }
-                }
-                Row(
-                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    CurrentTemperature(location?.hourly?.temperature?.get(0) ?: 0F,
-                        location?.hourly?.time?.get(0) ?: "erro", "28 máxima", "21 minima")
-                    Column(
-                        modifier = Modifier.padding(start = 15.dp)
-                    ) {
-                        Conditions(text = "Umidade", info = "88%", false)
-                        Spacer(modifier = Modifier.padding(8.dp))
-                        Conditions(text = "índice UV", info = "0", false)
-                    }
-                }
-                Row {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 15.dp)
-                    ) {
-                        Text(text = "Previsão para 7 dias", color = Color.Black, fontSize = 14.sp)
-                        Spacer(modifier = Modifier.padding(top = 2.dp))
-                        RowScrollHorizontal(false, location!!)
-                    }
-                }
-            }
-        } else {
-            Column {
-                Text(text = "Erro")
-            }
-        }
-    }
-}
 
-@Preview
-@Composable
-private fun GradientBackgroundPreview() {
-    MaterialTheme {
-        BackgroundMode(
+
+//@Preview
+//@Composable
+//private fun GradientBackgroundPreview() {
+//    MaterialTheme {
+//        BackgroundMode(
 //            Location(
 //                "-30.0",
 //                "-51.0",
@@ -439,6 +381,6 @@ private fun GradientBackgroundPreview() {
 //                    20.6F)
 //                ),
 //            )
-        )
-    }
-}
+//        )
+//    }
+//}

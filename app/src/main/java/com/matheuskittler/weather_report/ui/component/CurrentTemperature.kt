@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun CurrentTemperature(temperature: Float, date: String, max: String, min: String) {
+fun CurrentTemperature(temperature: List<Double>, date: List<String>, max: String, min: String) {
 
     Column(
         modifier = Modifier.wrapContentSize(),
@@ -46,6 +46,6 @@ fun CurrentTemperature(temperature: Float, date: String, max: String, min: Strin
 @Composable
 private fun CurrentTemperaturePreview() {
     MaterialTheme {
-        CurrentTemperature(28.8F, "12:00", "20", "12")
+        CurrentTemperature(listOf(28.8, 28.8, 28.8), "12:00", "20", "12")
     }
 }
