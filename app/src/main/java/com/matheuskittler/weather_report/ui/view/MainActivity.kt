@@ -1,154 +1,173 @@
 package com.matheuskittler.weather_report.ui.view
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import android.location.Location
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
-import com.matheuskittler.weather_report.model.Hourly
-import com.matheuskittler.weather_report.model.HourlyUnits
-import com.matheuskittler.weather_report.model.Location
+import com.google.android.gms.location.LocationServices
 import com.matheuskittler.weather_report.service.ApiService.createWeatherAPI
 import com.matheuskittler.weather_report.service.FakeAPI
-import com.matheuskittler.weather_report.service.IWeatherAPI
-import com.matheuskittler.weather_report.service.WeatherService
-import com.matheuskittler.weather_report.ui.component.Conditions
 import com.matheuskittler.weather_report.ui.component.CurrentTemperature
-import com.matheuskittler.weather_report.ui.component.RowScrollHorizontal
+import com.matheuskittler.weather_report.ui.component.ListHorizontal
+import com.matheuskittler.weather_report.ui.component.LoadingIndicator
 import com.matheuskittler.weather_report.ui.component.TextFieldLocation
-import com.matheuskittler.weather_report.utils.convertTimeToDayOfWeek
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.converter.gson.GsonConverterFactory
+import com.matheuskittler.weather_report.ui.component.WeatherList
+import com.matheuskittler.weather_report.ui.theme.BackgroundMode
+import com.matheuskittler.weather_report.utils.Utils
 
+const val FORECAST_DAYS = 7
+const val TIME_ZONE = "America/Sao_Paulo"
 
+val HOURLY_QUERIES = listOf(
+    "temperature",
+    "precipitation_probability",
+    "relative_humidity_2m"
+)
+
+val DAILY_QUERIES = listOf(
+    "uv_index_max",
+    "temperature_2m_max",
+    "temperature_2m_min",
+    "sunrise",
+    "sunset"
+)
+
+val CURRENT_QUERIES = listOf(
+    "temperature",
+    "relative_humidity_2m",
+    "uv_index",
+    "is_day"
+)
+
+@Suppress("DEPRECATION")
 class MainActivity : ComponentActivity() {
 
     private lateinit var viewModel: MainViewModel
+    val isLoading: MutableState<Boolean> = mutableStateOf(true)
+
+
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         init()
-        viewModel.fetchWeatherData("-29.9422", "-50.9928", 7, "temperature_2m", "temperature_2m")
-        viewModel.location.observe(this, { location ->
-            setContent {
-                BackgroundMode(viewModel = viewModel)
-            }
-        })
+        getLastKnownLocation()
+
     }
+
+    private fun getLastKnownLocation() {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        if (isLocationPermissionGranted()) {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    location?.let { onLocationObtained(it) }
+                }
+                .addOnFailureListener { e ->
+                    e.printStackTrace()
+                }
+        } else {
+            // Se a permissão ainda não foi concedida, solicitar permissão de localização
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+
+
+    private fun onLocationObtained(location: Location) {
+        val latitude = location.latitude
+        val longitude = location.longitude
+        viewModel.fetchWeatherData(
+            "$latitude",
+            "$longitude",
+            FORECAST_DAYS,
+            CURRENT_QUERIES,
+            TIME_ZONE,
+            HOURLY_QUERIES,
+            DAILY_QUERIES
+        )
+        viewModel.location.observe(this) {
+            setContent {
+                val isLoading = viewModel.isLoading.collectAsState()
+                BackgroundMode(viewModel = viewModel, isLoading)
+            }
+        }
+    }
+
+    private fun isLocationPermissionGranted(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Permissão de localização concedida, tentar obter a localização novamente
+            getLastKnownLocation()
+        } else {
+            // Permissão de localização negada, lidar com isso conforme necessário
+        }
+    }
+
 
     private fun init() {
-        val weatherAPI = createWeatherAPI() // Supondo que você tenha uma função para criar IWeatherAPI
+        val weatherAPI =
+            createWeatherAPI()
         val viewModelFactory = MainViewModelFactory(weatherAPI)
+        isLoading.value = true
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
     }
-
 }
 
 @Composable
-fun BackgroundMode(viewModel: MainViewModel) {
-//    val location by remember { mutableStateOf<Location?>(null) }
-
-    // Observa o estado da localização na ViewModel
-    val locationState by viewModel.location.observeAsState()
-
-    // Atualiza o estado da localização quando os dados da API são recebidos
-//    LaunchedEffect(viewModel.location) {
-//        viewModel.location.collection { newLocation ->
-//            location = newLocation
-//        }
-//    }
-
-    // UI
-    Scaffold { padding ->
-        Column(
-            modifier = Modifier.padding(padding)
-        ) {
-            // Se a localização não for nula, exiba os dados na tela
-            locationState?.let { location ->
-                TextFieldLocation(
-                    onSearch = { query ->
-                        // Lógica de pesquisa com a query
-                    }
-                )
-                Spacer(modifier = Modifier.padding(10.dp))
-                Row(
-                    modifier = Modifier.padding(horizontal = 15.dp)
-                ) {
-                    Column {
-                        Text(
-                            text = "Previsão do tempo de hora em hora",
-                            color = Color.Black,
-                            fontSize = 14.sp
-                        )
-                        Spacer(modifier = Modifier.padding(top = 2.dp))
-                        RowScrollHorizontal(false, location)
-                    }
-                }
-                Row(
-                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    val temperature = location.hourly.temperature
-                    val time = convertTimeToDayOfWeek(location.hourly.time)
-
-                    CurrentTemperature(
-                        temperature,
-                        time, "28 máxima", "21 minima"
-                    )
-                    Column(
-                        modifier = Modifier.padding(start = 15.dp)
-                    ) {
-                        Conditions(text = "Umidade", info = "88%", false)
-                        Spacer(modifier = Modifier.padding(8.dp))
-                        Conditions(text = "índice UV", info = "0", false)
-                    }
-                }
-                Row {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 15.dp)
-                    ) {
-                        Text(
-                            text = "Previsão para 7 dias",
-                            color = Color.Black,
-                            fontSize = 14.sp
-                        )
-                        Spacer(modifier = Modifier.padding(top = 2.dp))
-                        RowScrollHorizontal(false, location)
-                    }
-                }
-            }
-        }
+fun LoadingIndicator() {
+    Column(
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator(
+            color = Color.Black,
+            modifier = Modifier.wrapContentSize(),
+        )
     }
 }
 
@@ -156,5 +175,7 @@ fun BackgroundMode(viewModel: MainViewModel) {
 @Composable
 fun GreetingPreview() {
     val viewModel = MainViewModel(FakeAPI())
-    BackgroundMode(viewModel = viewModel)
+    val isLoading = remember { mutableStateOf(false) }
+//    BackgroundMode(viewModel = viewModel, isLoading)
+    LoadingIndicator()
 }

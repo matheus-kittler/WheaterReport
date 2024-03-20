@@ -31,55 +31,40 @@ import java.nio.file.WatchEvent
 @Composable
 fun Conditions(
     text: String,
-    info: String,
-    changeColor: Boolean
+    info: String
 ) {
-
-    val backgroundColor: Color = MaterialTheme.colorScheme.onPrimary
     val textColor: Color = Color.Black
-    when (changeColor) {
-        true -> {
-            MaterialTheme.colorScheme.onBackground
-        }
 
-        false -> {
-            MaterialTheme.colorScheme.onPrimary
-        }
-    }
 
     Column (
         modifier = Modifier
             .wrapContentSize()
             .clip(shape = MaterialTheme.shapes.medium)
     ) {
-        Box(
-            modifier = Modifier
-                .background(color = backgroundColor)
-                .padding(10.dp),
-        ) {
-            Row {
-                Column(
-                    modifier = Modifier.wrapContentSize()
-                ) {
-                    Row {
-                        Text(text = text, color = textColor)
-                    }
-                    Row {
-                        Text(text = info)
-                    }
+        Row {
+            Column(
+                modifier = Modifier.wrapContentSize()
+            ) {
+                Row {
+                    Text(text = text, color = textColor,
+                        fontSize = 22.sp)
+                }
+                Row {
+                    Text(text = info, color = textColor,
+                        fontSize = 18.sp)
+                }
 
-                }
-                Spacer(modifier = Modifier.padding(start = 12.dp))
-                Column(
-                    verticalArrangement = Arrangement.Top
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = null,
-                        tint = textColor,
-                        modifier = Modifier.wrapContentSize()
-                    )
-                }
+            }
+            Spacer(modifier = Modifier.padding(start = 12.dp))
+            Column(
+                verticalArrangement = Arrangement.Top
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    tint = textColor,
+                    modifier = Modifier.wrapContentSize()
+                )
             }
         }
     }
@@ -89,6 +74,6 @@ fun Conditions(
 @Composable
 private fun ConditionsPreview() {
     MaterialTheme {
-        Conditions("Umidade", "88%", true)
+        Conditions("Umidade", "88%")
     }
 }

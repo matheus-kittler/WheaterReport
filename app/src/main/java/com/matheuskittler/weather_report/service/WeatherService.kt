@@ -15,11 +15,13 @@ class WeatherService(private val retrofit: Retrofit) : IWeatherService {
         latitude: String,
         longitude: String,
         forecastDays: Int,
-        temperature: String,
-        hourly: String
+        current: List<String>,
+        timezone: String,
+        hourly: List<String>,
+        daily: List<String>
     ): Flow<Location> {
         return flow {
-            val response = weatherAPI.getWeatherReport(latitude, longitude, forecastDays, temperature, hourly)
+            val response = weatherAPI.getWeatherReport(latitude, longitude, forecastDays, current, timezone, hourly, daily)
             if (response.isSuccessful) {
                 val location = response.body() ?: throw IllegalStateException("Resposta vazia")
                 emit(location) // Emitir o resultado do serviço como um fluxo

@@ -8,7 +8,9 @@ interface IWeatherService {
         latitude: String,
         longitude: String,
         forecastDays: Int,
-        temperature: String,
-        hourly: String
+        current: List<String>,
+        timezone: String,
+        hourly: List<String>,
+        daily: List<String>
     ): Flow<Location>
 }
