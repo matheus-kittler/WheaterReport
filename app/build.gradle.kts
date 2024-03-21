@@ -105,4 +105,14 @@ dependencies {
 
     //GeoCode
     implementation("com.google.android.gms:play-services-location:21.2.0")
+
+    //Robolectric
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.11.1")
+
+    //Mockito
+    testImplementation("org.mockito:mockito-core:3.12.4")
+
+   testImplementation("androidx.arch.core:core-testing:2.2.0")
+
 }

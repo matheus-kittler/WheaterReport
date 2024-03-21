@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Weather-Report</string>
+    <string name="temperature">temperature</string>
+    <string name="relative_humidity_2m">relative_humidity_2m</string>
+    <string name="uv_index">uv_index</string>
+    <string name="is_day">is_day</string>
+    <string name="hint_location_search">Pesquisar um local</string>
+    <string name="ic_info_location">Localização</string>
+    <string name="text_weather_report_hour">Previsão do tempo de hora em hora</string>
+    <string name="text_weather_report_day">Previsão para 7 dias</string>
+    <string name="illegal_argument_exception">Unknown ViewModel class</string>
+    <string name="text_humidity">Umidade</string>
+    <string name="text_uv_index">Índice UV</string>
+    <string name="text_info">8%</string>
+    <string name="ic_weather_description">ícone do tempo</string>
 </resources>

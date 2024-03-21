@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.matheuskittler.weather_report.utils
 
 import android.content.Context

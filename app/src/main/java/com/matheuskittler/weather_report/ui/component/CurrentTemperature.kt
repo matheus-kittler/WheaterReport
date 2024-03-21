@@ -18,9 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.matheuskittler.weather_report.R
 import com.matheuskittler.weather_report.model.CurrentWeather
 import com.matheuskittler.weather_report.model.Daily
 import com.matheuskittler.weather_report.model.Hourly
@@ -54,7 +56,7 @@ fun CurrentTemperature(location: Location) {
                 )
                 Icon(
                     imageVector = Icons.Rounded.Favorite,
-                    contentDescription = "",
+                    contentDescription = stringResource(R.string.ic_weather_description),
                     tint = Color.Black,
                     modifier = Modifier
                         .padding(8.dp)
@@ -73,9 +75,9 @@ fun CurrentTemperature(location: Location) {
         Column(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Conditions(text = "Umidade", info = location.current.humidity)
+            Conditions(text = stringResource(R.string.text_humidity), info = location.current.humidity)
             Spacer(modifier = Modifier.padding(10.dp))
-            Conditions(text = "UV", info = location.current.uvIndex)
+            Conditions(text = stringResource(R.string.text_uv_index), info = location.current.uvIndex)
         }
     }
 }

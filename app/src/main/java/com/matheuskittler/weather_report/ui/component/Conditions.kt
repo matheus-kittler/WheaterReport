@@ -1,32 +1,25 @@
 package com.matheuskittler.weather_report.ui.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.nio.file.WatchEvent
+import com.matheuskittler.weather_report.R
 
 @Composable
 fun Conditions(
@@ -36,7 +29,7 @@ fun Conditions(
     val textColor: Color = Color.Black
 
 
-    Column (
+    Column(
         modifier = Modifier
             .wrapContentSize()
             .clip(shape = MaterialTheme.shapes.medium)
@@ -46,12 +39,16 @@ fun Conditions(
                 modifier = Modifier.wrapContentSize()
             ) {
                 Row {
-                    Text(text = text, color = textColor,
-                        fontSize = 22.sp)
+                    Text(
+                        text = text, color = textColor,
+                        fontSize = 22.sp
+                    )
                 }
                 Row {
-                    Text(text = info, color = textColor,
-                        fontSize = 18.sp)
+                    Text(
+                        text = info, color = textColor,
+                        fontSize = 18.sp
+                    )
                 }
 
             }
@@ -74,6 +71,9 @@ fun Conditions(
 @Composable
 private fun ConditionsPreview() {
     MaterialTheme {
-        Conditions("Umidade", "88%")
+        Conditions(
+            stringResource(R.string.text_humidity),
+            stringResource(R.string.text_info)
+        )
     }
 }

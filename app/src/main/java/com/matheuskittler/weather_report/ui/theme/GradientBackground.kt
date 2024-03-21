@@ -5,21 +5,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.matheuskittler.weather_report.R
 import com.matheuskittler.weather_report.ui.component.CurrentTemperature
-import com.matheuskittler.weather_report.ui.component.ListHorizontal
+import com.matheuskittler.weather_report.ui.component.HourWeatherList
 import com.matheuskittler.weather_report.ui.component.LoadingIndicator
 import com.matheuskittler.weather_report.ui.component.TextFieldLocation
-import com.matheuskittler.weather_report.ui.component.WeatherList
+import com.matheuskittler.weather_report.ui.component.TextTitle
+import com.matheuskittler.weather_report.ui.component.DayWeatherList
 import com.matheuskittler.weather_report.ui.view.CURRENT_QUERIES
 import com.matheuskittler.weather_report.ui.view.DAILY_QUERIES
 import com.matheuskittler.weather_report.ui.view.FORECAST_DAYS
@@ -41,13 +41,11 @@ fun BackgroundMode(viewModel: MainViewModel, isLoading: State<Boolean>) {
             Column(
                 modifier = Modifier.padding(padding)
             ) {
-                // Se a localização não for nula, exiba os dados na tela
                 locationState?.let { location ->
                     val context = LocalContext.current
                     TextFieldLocation(context = context, onSearch = { query ->
                         val coordinates = Utils.getLocationFromAddress(context, query)
                         coordinates?.let { location ->
-                            // Aqui você pode usar as coordenadas para buscar os dados meteorológicos
                             val latitude = location.latitude
                             val longitude = location.longitude
                             viewModel.fetchWeatherData(
@@ -65,13 +63,9 @@ fun BackgroundMode(viewModel: MainViewModel, isLoading: State<Boolean>) {
                         modifier = Modifier.padding(start = 15.dp, end = 15.dp)
                     ) {
                         Column {
-                            Text(
-                                text = "Previsão do tempo de hora em hora",
-                                color = Color.Black,
-                                fontSize = 14.sp
-                            )
+                            TextTitle(text = stringResource(R.string.text_weather_report_hour))
                             Spacer(modifier = Modifier.padding(top = 2.dp))
-                            WeatherList(
+                            DayWeatherList(
                                 times = location.hourly.time,
                                 temperatures = location.hourly.temperature
                             )
@@ -82,13 +76,9 @@ fun BackgroundMode(viewModel: MainViewModel, isLoading: State<Boolean>) {
                     ) {
                         CurrentTemperature(location)
                     }
-                    Text(
-                        text = "Previsão para 7 dias",
-                        color = Color.Black,
-                        fontSize = 14.sp
-                    )
+                    TextTitle(text = stringResource(R.string.text_weather_report_day))
                     Spacer(modifier = Modifier.padding(top = 2.dp))
-                    ListHorizontal(
+                    HourWeatherList(
                         times = location.hourly.time,
                         temperatures = location.hourly.temperature
                     )

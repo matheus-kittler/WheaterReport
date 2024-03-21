@@ -5,43 +5,24 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Modifier
 import android.location.Location
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationServices
-import com.matheuskittler.weather_report.service.ApiService.createWeatherAPI
+import com.matheuskittler.weather_report.service.AppDispatcher
 import com.matheuskittler.weather_report.service.FakeAPI
-import com.matheuskittler.weather_report.ui.component.CurrentTemperature
-import com.matheuskittler.weather_report.ui.component.ListHorizontal
-import com.matheuskittler.weather_report.ui.component.LoadingIndicator
-import com.matheuskittler.weather_report.ui.component.TextFieldLocation
-import com.matheuskittler.weather_report.ui.component.WeatherList
+import com.matheuskittler.weather_report.service.IWeatherService
 import com.matheuskittler.weather_report.ui.theme.BackgroundMode
-import com.matheuskittler.weather_report.utils.Utils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import org.koin.android.ext.android.inject
+import kotlin.coroutines.CoroutineContext
 
 const val FORECAST_DAYS = 7
 const val TIME_ZONE = "America/Sao_Paulo"
@@ -70,7 +51,7 @@ val CURRENT_QUERIES = listOf(
 @Suppress("DEPRECATION")
 class MainActivity : ComponentActivity() {
 
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by inject()
     val isLoading: MutableState<Boolean> = mutableStateOf(true)
 
 
@@ -80,10 +61,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        init()
         getLastKnownLocation()
-
     }
+
 
     private fun getLastKnownLocation() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -97,7 +77,6 @@ class MainActivity : ComponentActivity() {
                     e.printStackTrace()
                 }
         } else {
-            // Se a permissão ainda não foi concedida, solicitar permissão de localização
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -105,7 +84,6 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
-
 
     private fun onLocationObtained(location: Location) {
         val latitude = location.latitude
@@ -142,40 +120,37 @@ class MainActivity : ComponentActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Permissão de localização concedida, tentar obter a localização novamente
             getLastKnownLocation()
         } else {
-            // Permissão de localização negada, lidar com isso conforme necessário
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
         }
-    }
-
-
-    private fun init() {
-        val weatherAPI =
-            createWeatherAPI()
-        val viewModelFactory = MainViewModelFactory(weatherAPI)
-        isLoading.value = true
-        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-    }
-}
-
-@Composable
-fun LoadingIndicator() {
-    Column(
-        verticalArrangement = Arrangement.Center
-    ) {
-        CircularProgressIndicator(
-            color = Color.Black,
-            modifier = Modifier.wrapContentSize(),
-        )
     }
 }
 
 @Preview
 @Composable
 fun GreetingPreview() {
-    val viewModel = MainViewModel(FakeAPI())
+    val viewModel = MainViewModel(object : IWeatherService {
+        override suspend fun getWeatherData(
+            latitude: String,
+            longitude: String,
+            forecastDays: Int,
+            current: List<String>,
+            timezone: String,
+            hourly: List<String>,
+            daily: List<String>
+        ): Flow<com.matheuskittler.weather_report.model.Location> {
+            return flow {  }
+        }
+
+    },object : AppDispatcher {
+        override var main: CoroutineContext = Dispatchers.Unconfined
+        override var io: CoroutineContext = Dispatchers.Unconfined
+    })
     val isLoading = remember { mutableStateOf(false) }
-//    BackgroundMode(viewModel = viewModel, isLoading)
-    LoadingIndicator()
+    BackgroundMode(viewModel = viewModel, isLoading)
 }
