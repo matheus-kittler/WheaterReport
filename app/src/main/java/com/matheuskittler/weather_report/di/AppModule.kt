@@ -3,6 +3,7 @@ package com.matheuskittler.weather_report.di
 import com.matheuskittler.weather_report.service.AppDispatcher
 import org.koin.dsl.module
 import com.matheuskittler.weather_report.service.IWeatherAPI
+import com.matheuskittler.weather_report.service.IWeatherService
 import com.matheuskittler.weather_report.service.WeatherService
 import com.matheuskittler.weather_report.ui.view.MainViewModel
 import kotlinx.coroutines.Dispatchers
@@ -14,23 +15,31 @@ import kotlin.coroutines.CoroutineContext
 private const val BASE_URL = "https://api.open-meteo.com"
 
 val appModule = module {
-    // Declaração do serviço WeatherService
-    single { WeatherService(get()) }
-
-    // Configuração do Retrofit e criação da instância de IWeatherAPI
-    single<IWeatherAPI> {
-        val retrofit = Retrofit.Builder()
+    // Configuração do Retrofit
+    single {
+        Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
 
-        retrofit.create(IWeatherAPI::class.java)
+    // Declaração do serviço WeatherService
+    single { WeatherService(get()) }
+
+    // Configuração do serviço de API do tempo
+    single<IWeatherAPI> { get<Retrofit>().create(IWeatherAPI::class.java) }
+
+    // Definição e fornecimento de IWeatherService
+    single<IWeatherService> { get<WeatherService>() }
+
+    // Fornecimento do AppDispatcher
+    single<AppDispatcher> {
+        object : AppDispatcher {
+            override var main: CoroutineContext = Dispatchers.Main
+            override var io: CoroutineContext = Dispatchers.IO
+        }
     }
-    single {object : AppDispatcher {
-        override var main: CoroutineContext = Dispatchers.Main
-        override var io: CoroutineContext = Dispatchers.IO
-    }}
-    viewModel {
-        MainViewModel(get(), get())
-    }
+
+    // ViewModel
+    viewModel { MainViewModel(get(), get()) }
 }
