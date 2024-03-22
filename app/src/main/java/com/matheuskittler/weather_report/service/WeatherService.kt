@@ -1,34 +1,32 @@
 package com.matheuskittler.weather_report.service
 
-import android.util.Log
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.matheuskittler.weather_report.model.Location
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 
-class WeatherService {
+class WeatherService(private val retrofit: Retrofit) : IWeatherService {
 
-    private val baseUrl = "https://api.open-meteo.com"
+    private val weatherAPI: IWeatherAPI by lazy {
+        retrofit.create(IWeatherAPI::class.java)
+    }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    fun getWeather(latitude: String, longitude: String, forecastDays: Int, hourly: String) {
-
-        val api = Retrofit
-            .Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(
-                GsonConverterFactory.create()
-            ).build().create(IWeatherAPI::class.java)
-
-
-        GlobalScope.launch(Dispatchers.IO) {
-            val response = api.getWeatherReport(latitude, longitude, forecastDays, hourly)
-            Log.d( "Response", "Response: ${response.body()}")
+    override suspend fun getWeatherData(
+        latitude: String,
+        longitude: String,
+        forecastDays: Int,
+        current: List<String>,
+        timezone: String,
+        hourly: List<String>,
+        daily: List<String>
+    ): Flow<Location> {
+        return flow {
+            val response = weatherAPI.getWeatherReport(latitude, longitude, forecastDays, current, timezone, hourly, daily)
             if (response.isSuccessful) {
-                response.body()
+                val location = response.body() ?: throw IllegalStateException("Resposta vazia")
+                emit(location) // Emitir o resultado do serviço como um fluxo
+            } else {
+                throw IllegalStateException("Erro na requisição: ${response.code()} - ${response.message()}")
             }
         }
     }
