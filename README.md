@@ -33,3 +33,5 @@ Weather Report é um app simples que trará as infomações do tempo, como já m
 ## Testes
 
 O teste é feito somente na viewmodel do projeto, primeiro você precisa estar utilizando a IDE Android Studios, abrir o projeto lá e acessar as pastas, app > kotlin+java > com (test) > matheuskittler > weather_report > ui > MainViewModelTest, este é o caminho. Clicando na Classe você terá um ícone perto das linhas numeradas para dar Play, após um curto tempo, a IDE irá retornar o resultado dos testes se estão funcionando e se estão cubrindo a maior porcentagem de possibilidades das funções testadas tanto para sucesso, quanto erro.
+
+[Notas](https://dontpad.com/desafio-weather-report)
