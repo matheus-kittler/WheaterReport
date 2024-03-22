@@ -15,7 +15,6 @@ import kotlin.coroutines.CoroutineContext
 private const val BASE_URL = "https://api.open-meteo.com"
 
 val appModule = module {
-    // Configuração do Retrofit
     single {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -23,16 +22,12 @@ val appModule = module {
             .build()
     }
 
-    // Declaração do serviço WeatherService
     single { WeatherService(get()) }
 
-    // Configuração do serviço de API do tempo
     single<IWeatherAPI> { get<Retrofit>().create(IWeatherAPI::class.java) }
 
-    // Definição e fornecimento de IWeatherService
     single<IWeatherService> { get<WeatherService>() }
 
-    // Fornecimento do AppDispatcher
     single<AppDispatcher> {
         object : AppDispatcher {
             override var main: CoroutineContext = Dispatchers.Main

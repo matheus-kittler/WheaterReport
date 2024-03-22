@@ -50,18 +50,6 @@ fun Conditions(
                         fontSize = 18.sp
                     )
                 }
-
-            }
-            Spacer(modifier = Modifier.padding(start = 12.dp))
-            Column(
-                verticalArrangement = Arrangement.Top
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
-                    tint = textColor,
-                    modifier = Modifier.wrapContentSize()
-                )
             }
         }
     }

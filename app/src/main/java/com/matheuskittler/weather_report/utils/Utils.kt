@@ -7,8 +7,11 @@ import android.location.Geocoder
 import com.google.android.gms.maps.model.LatLng
 import com.matheuskittler.weather_report.model.Location
 import java.io.IOException
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -31,23 +34,47 @@ object Utils {
         return null
     }
 
-    fun convTimeToDayOfWeek(timeText: String): String {
+    fun formatDateToHour(timeText: String): String {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
         val dateTime = LocalDateTime.parse(timeText, formatter)
-        val dayOfWeek = dateTime.dayOfWeek.toString()
-        return dayOfWeek
+        val now = LocalDateTime.now()
+        val tomorrow24h = now.toLocalDate().plusDays(1).atTime(LocalTime.of(23, 0))
+
+        return if (dateTime.isAfter(now) && dateTime.isBefore(tomorrow24h)) {
+            val hourFormatter = DateTimeFormatter.ofPattern("HH:mm")
+            dateTime.format(hourFormatter)
+        } else {
+            ""
+        }
+    }
+
+    fun filterTimes(times: List<String>): List<String> {
+        val currentTime = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+
+        return times.filter {
+            val dateTime = LocalDateTime.parse(it, formatter)
+            dateTime.isAfter(currentTime) && dateTime.isBefore(currentTime.plusHours(24))
+        }
+    }
+
+    fun formatDateToDay(timeText: String): String {
+        return try {
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            val date = LocalDate.parse(timeText, formatter)
+            val dayOfMonth = date.dayOfMonth
+            val month = date.monthValue
+            String.format("%02d/%02d", dayOfMonth, month)
+        } catch (e: DateTimeParseException) {
+            "Data inválida"
+        }
     }
 
     fun getMaxAndMinTemperatureForCurrentDay(location: Location): Pair<Double?, Double?> {
         val currentDay = location.current.time.substring(0, 10) // Extrair a data atual
-
-        // Encontrar o índice da data atual na lista de datas
         val index = location.daily.time.indexOfFirst { it == currentDay }
 
-        // Se a data atual não for encontrada na lista de datas, retornar null para ambas as temperaturas
         if (index == -1) return Pair(null, null)
-
-        // Retornar a temperatura máxima e mínima correspondentes à data atual
         return Pair(
             location.daily.maxTemperature.getOrNull(index),
             location.daily.minTemperature.getOrNull(index)
@@ -63,7 +90,6 @@ object Utils {
             "Agora"
         } else {
             val dayOfWeek = dateTime.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
-            // Capitalizar a primeira letra
             dayOfWeek.substring(0, 1).uppercase(Locale.getDefault()) + dayOfWeek.substring(1)
         }
     }

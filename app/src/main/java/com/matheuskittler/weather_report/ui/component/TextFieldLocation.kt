@@ -27,13 +27,14 @@ import androidx.core.content.ContextCompat.getString
 import com.matheuskittler.weather_report.R
 
 @Composable
-fun TextFieldLocation
-            (
+fun TextFieldLocation(
     context: Context,
     onSearch: (String) -> Unit
 ) {
     var query by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val maxChar = 100
+    val isLine = true
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -42,10 +43,20 @@ fun TextFieldLocation
     ) {
         TextField(
             value = query,
-            onValueChange = { query = it },
+            onValueChange = {
+                if (it.length <= maxChar) {
+                    query = it
+                }
+            },
+            singleLine = isLine,
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(R.string.hint_location_search)) },
-            leadingIcon = { Icon(Icons.Outlined.LocationOn, contentDescription = stringResource(R.string.ic_info_location)) },
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.LocationOn,
+                    contentDescription = stringResource(R.string.ic_info_location)
+                )
+            },
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 keyboardController?.hide()

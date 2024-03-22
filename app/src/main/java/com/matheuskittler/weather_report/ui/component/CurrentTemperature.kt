@@ -4,14 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,14 +48,6 @@ fun CurrentTemperature(location: Location) {
                     color = Color.Black,
                     fontSize = 59.sp
                 )
-                Icon(
-                    imageVector = Icons.Rounded.Favorite,
-                    contentDescription = stringResource(R.string.ic_weather_description),
-                    tint = Color.Black,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(40.dp)
-                )
             }
             Row {
                 Text(
@@ -75,7 +61,7 @@ fun CurrentTemperature(location: Location) {
         Column(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Conditions(text = stringResource(R.string.text_humidity), info = location.current.humidity)
+            Conditions(text = stringResource(R.string.text_humidity), info = "${location.current.humidity}%")
             Spacer(modifier = Modifier.padding(10.dp))
             Conditions(text = stringResource(R.string.text_uv_index), info = location.current.uvIndex)
         }

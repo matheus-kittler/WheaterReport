@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,16 +15,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.matheuskittler.weather_report.utils.Utils
 
 @Composable
-fun RowHorizontalComponent(
-    time: String, temperature: String
+fun WeatherDayItem(
+    time: String, temperatureMax: String, temperatureMin: String
 ) {
 
-    Box (
-        modifier = Modifier.background(Color.Red)
-//            .background() TODO colocar adaptavel a cor com o dia/noite, sol/chuva
-    ) {
+    Box {
         Column(
             modifier = Modifier
                 .background(color = Color.White)
@@ -36,24 +31,17 @@ fun RowHorizontalComponent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = time,
-                fontSize = 9.sp,
+                text = Utils.formatDateToDay(time),
+                fontSize = 16.sp,
                 modifier = Modifier
-                    .padding(5.dp)
-            )
-            Icon(
-                imageVector = Icons.Rounded.Favorite,
-                contentDescription = null,
-                tint = Color.Black,
-                modifier = Modifier
-                    .padding(16.dp)
+                    .padding(15.dp)
             )
 
             Text(
-                text = temperature,
-                fontSize = 12.sp,
+                text = "Max $temperatureMax - Min $temperatureMin",
+                fontSize = 16.sp,
                 modifier = Modifier
-                    .padding(5.dp)
+                    .padding(15.dp)
             )
         }
     }
@@ -61,8 +49,8 @@ fun RowHorizontalComponent(
 
 @Preview
 @Composable
-private fun RowHorizontalComponentPreview() {
+private fun WeatherDayListItemPreview() {
     MaterialTheme {
-        RowHorizontalComponent(time = "wendsday", temperature = "28°C")
+        WeatherDayItem(time = "wendsday", temperatureMax = "28°C", temperatureMin = "18°C")
     }
 }
